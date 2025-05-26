@@ -1,0 +1,648 @@
+#bloque para importar el pyodbc y la libreria que usaremos aparte, datetime.
+
+import pyodbc
+from datetime import datetime
+
+#bloque para hacer la conexion para el pydobc de la base de datos con python
+try:
+    conexion = pyodbc.connect(
+        "DRIVER={SQL Server};"
+        "SERVER=GWNR51416;"
+        "DATABASE=MensajeriaProyecto;"
+        "Trusted_Connection=yes;"
+    )
+    print("conexion exitosa")
+except Exception as e:
+    print("error al conectar con la base de datos:", e)
+
+#linea con la variable que nos ayudara a ejecutar los codigos que necesitemos
+cursor = conexion.cursor()
+
+# bloque para registrar los usuarios
+def registrar_usuario(cursor, conexion):
+    repetir = True
+    while repetir:
+        try:
+            print("\n--- Registrar Usuario ---")
+            nombre = input("Nombre: ")
+            telefono = input("Telefono: ")
+            email = input("Email: ")
+            rol = input("Rol: ")
+
+            # Validar que telefono no exista ya en la base
+            cursor.execute("SELECT COUNT(*) FROM Usuarios WHERE Telefono = ?", (telefono,))
+            resultado = cursor.fetchone()
+            if resultado[0] > 0:
+                print("Telefono ya registrado. Intente con otro.")
+                repetir = True
+            else:
+                print("Avanzando con el programa...")
+
+                # Insertar nuevo usuario
+                cursor.execute(
+                    "INSERT INTO Usuarios (Nombre, Telefono, Email, Rol) VALUES (?, ?, ?, ?)",
+                    (nombre, telefono, email, rol)
+                )
+                conexion.commit()
+
+                print("\n[✓] Usuario registrado con éxito.")
+                print("Nombre registrado:", nombre)
+                print("Teléfono registrado:", telefono)
+                print("Email registrado:", email)
+                print("Rol registrado:", rol)
+
+                repetir = False
+        except Exception as e:
+            print("Error al registrar usuario:", e)
+            print("Intente de nuevo.")
+
+            
+#Bloque para ver lista de usuarios
+def ver_lista_usuarios(cursor):
+    try:
+        cursor.execute("SELECT UsuarioID, Nombre, Telefono, Email, Rol FROM Usuarios")
+        usuarios = cursor.fetchall()
+        
+        if len(usuarios) == 0:
+            print("No hay usuarios registrados.")
+        else:
+            print("\n--- Lista de Usuarios ---")
+            for usuario in usuarios:
+                print("ID:", usuario[0])
+                print("Nombre:", usuario[1])
+                print("Telefono:", usuario[2])
+                print("Email:", usuario[3])
+                print("Rol:", usuario[4])
+                print("-------------------------")
+    except Exception as e:
+        print("Error al obtener la lista de usuarios:", e)
+
+
+
+# bloque con todo lo necesario para enviar mensajes desde un remitente, hasta un destinatario
+def enviar_mensaje():
+    print("\n")
+    print("+---------------------------------------------------+")
+    print("|            Para insertar es asi:                  |")
+    print("+---------------------------------------------------+")
+    print("|    A: 2, B: 22, C: 222, D: 3, E: 33, F: 333       |")
+    print("+---------------------------------------------------+")
+    print("|    G: 4, H: 44, I: 444, J: 5, K: 55, L: 555       |")
+    print("+---------------------------------------------------+")
+    print("|M: 6, N: 66, O: 666, P: 7, Q: 77, R: 777, S: 7777  |")
+    print("+---------------------------------------------------+")
+    print("|T: 8, U: 88, V: 888, W: 9, X: 99, Y: 999, Z: 9999  |")
+    print("+---------------------------------------------------+")
+    print("|          La tecla |del 0| significa espacio.      |")
+    print("+---------------------------------------------------+ \n")
+    remitente_id = input("Ingrese su UsuarioID (remitente): ")
+    if remitente_id.strip() == "":
+        print("Debe ingresar un UsuarioID válido.")
+        return
+    else:
+        mensaje = input("Introduce el mensaje que deseas mandar (teclado numérico viejo): ")
+
+        entradas = ["0", "2", "3", "4", "5", "6", "7", "8", "9", " "]
+        invalido = False
+        espacios = True
+
+        for caracter in mensaje:
+            if caracter not in entradas:
+                invalido = True
+            else:
+                if caracter != "0" and caracter != " ":
+                    espacios = False
+
+        if invalido:
+            print("Ingresaste un carácter no válido. Solo puedes usar números del 0 al 9 (excepto el 1). Inténtalo de nuevo.")
+            return
+        else:
+            if espacios:
+                print("Solo ingresaste espacios o ceros. Ingresa números enteros válidos.")
+                return
+            else:
+                resultado = ""
+                numero = ""
+                posicion = 0
+                longitud = len(mensaje)
+
+                while posicion < longitud:
+                    actual = mensaje[posicion]
+                    if posicion > 0 and mensaje[posicion] != mensaje[posicion - 1]:
+                        if numero == "2":
+                            resultado += "a"
+                        elif numero == "22":
+                            resultado += "b"
+                        elif numero == "222":
+                            resultado += "c"
+                        elif numero == "3":
+                            resultado += "d"
+                        elif numero == "33":
+                            resultado += "e"
+                        elif numero == "333":
+                            resultado += "f"
+                        elif numero == "4":
+                            resultado += "g"
+                        elif numero == "44":
+                            resultado += "h"
+                        elif numero == "444":
+                            resultado += "i"
+                        elif numero == "5":
+                            resultado += "j"
+                        elif numero == "55":
+                            resultado += "k"
+                        elif numero == "555":
+                            resultado += "l"
+                        elif numero == "6":
+                            resultado += "m"
+                        elif numero == "66":
+                            resultado += "n"
+                        elif numero == "666":
+                            resultado += "o"
+                        elif numero == "7":
+                            resultado += "p"
+                        elif numero == "77":
+                            resultado += "q"
+                        elif numero == "777":
+                            resultado += "r"
+                        elif numero == "7777":
+                            resultado += "s"
+                        elif numero == "8":
+                            resultado += "t"
+                        elif numero == "88":
+                            resultado += "u"
+                        elif numero == "888":
+                            resultado += "v"
+                        elif numero == "9":
+                            resultado += "w"
+                        elif numero == "99":
+                            resultado += "x"
+                        elif numero == "999":
+                            resultado += "y"
+                        elif numero == "9999":
+                            resultado += "z"
+                        elif numero == "0":
+                            resultado += " "
+                        else:
+                            pass
+                        numero = mensaje[posicion]
+                    else:
+                        numero += mensaje[posicion]
+                    posicion += 1
+
+                if numero == "2":
+                    resultado += "a"
+                elif numero == "22":
+                    resultado += "b"
+                elif numero == "222":
+                    resultado += "c"
+                elif numero == "3":
+                    resultado += "d"
+                elif numero == "33":
+                    resultado += "e"
+                elif numero == "333":
+                    resultado += "f"
+                elif numero == "4":
+                    resultado += "g"
+                elif numero == "44":
+                    resultado += "h"
+                elif numero == "444":
+                    resultado += "i"
+                elif numero == "5":
+                    resultado += "j"
+                elif numero == "55":
+                    resultado += "k"
+                elif numero == "555":
+                    resultado += "l"
+                elif numero == "6":
+                    resultado += "m"
+                elif numero == "66":
+                    resultado += "n"
+                elif numero == "666":
+                    resultado += "o"
+                elif numero == "7":
+                    resultado += "p"
+                elif numero == "77":
+                    resultado += "q"
+                elif numero == "777":
+                    resultado += "r"
+                elif numero == "7777":
+                    resultado += "s"
+                elif numero == "8":
+                    resultado += "t"
+                elif numero == "88":
+                    resultado += "u"
+                elif numero == "888":
+                    resultado += "v"
+                elif numero == "9":
+                    resultado += "w"
+                elif numero == "99":
+                    resultado += "x"
+                elif numero == "999":
+                    resultado += "y"
+                elif numero == "9999":
+                    resultado += "z"
+                elif numero == "0":
+                    resultado += " "
+                else:
+                    pass
+
+                if resultado == "":
+                    print("Los números que acabas de ingresar están fuera de rango, intenta de nuevo.\n")
+                    return
+                else:
+                    print("Lo que escribiste fue: " + resultado)
+
+                from datetime import datetime
+                fecha_envio = datetime.now()
+
+                cursor = conexion.cursor()
+                try:
+                    cursor.execute(
+                                    "INSERT INTO Mensajes (RemitenteID, MensajeOriginal, MensajeTraducido, FechaEnvio, contenido) VALUES (?, ?, ?, ?, ?)", 
+                                    (remitente_id, mensaje, resultado, fecha_envio, resultado)
+                                )
+                    conexion.commit()
+                    mensaje_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+                    print("Mensaje guardado con MensajeID: " + str(mensaje_id))
+                except Exception as e:
+                    print("Error al guardar el mensaje: " + str(e))
+                    return
+                else:
+                    destinatarios = []
+                    print("Ingrese los UsuarioID de los destinatarios. Para terminar, ingrese 0.")
+
+                    terminado = False
+                    while terminado == False:
+                        dest_id = input("UsuarioID destinatario: ")
+                        if dest_id == "0":
+                            terminado = True
+                        else:
+                            if dest_id.strip() == "":
+                                print("Debe ingresar un UsuarioID válido.")
+                            else:
+                                destinatarios.append(dest_id)
+
+                    for dest_id in destinatarios:
+                        try:
+                            cursor.execute("INSERT INTO MensajesDestinatarios (MensajeID, DestinatarioID, Estado, FechaEstado) VALUES (?, ?, ?, ?)", (mensaje_id, dest_id, "Enviado", fecha_envio))
+                            conexion.commit()
+                        except Exception as e:
+                            print("Error al guardar destinatario " + dest_id + ": " + str(e))
+                        else:
+                            pass
+
+                    print("Mensaje enviado a " + str(len(destinatarios)) + " destinatarios.")
+
+
+
+#Bloque para ver los mensajes que se han enviadso
+def ver_mensajes_enviados(cursor):
+    error = True
+    while error == True:
+        remitente_id = input("Ingresa tu UsuarioID para ver mensajes enviados: ")
+        try:
+            remitente_id = int(remitente_id)
+            error = False
+        except ValueError:
+            print("Error: Debes ingresar un numero valido para UsuarioID.")
+
+    try:
+        cursor.execute("SELECT MensajeID, MensajeOriginal, MensajeTraducido, FechaEnvio, contenido FROM Mensajes WHERE RemitenteID = ? ORDER BY FechaEnvio DESC", (remitente_id,))
+        mensajes = cursor.fetchall()
+
+        if len(mensajes) == 0:
+            print("No tienes mensajes enviados.")
+            return
+        else:
+            print("\n--- Mensajes enviados por UsuarioID " + str(remitente_id) + " ---")
+            for mensaje in mensajes:
+                print("ID: " + str(mensaje[0]) + ", Fecha: " + str(mensaje[3]))
+                print("  Mensaje (números): " + str(mensaje[1]))
+                print("  Mensaje (texto): " + str(mensaje[2]))
+                print("  Contenido: " + str(mensaje[4])) 
+    except Exception as e:
+        print("Error al obtener mensajes enviados: " + str(e))
+
+
+#Bloque para poder crear los grupos
+def crear_grupo(cursor, conexion):
+    repetir = True
+    while repetir:
+        nombre_grupo = input("Ingresa el nombre del grupo: ").strip()
+        if nombre_grupo == "":
+            print("El nombre no puede estar vacio.")
+        else:
+            try:
+                cursor.execute("SELECT COUNT(*) FROM Grupos WHERE Nombre = ?", (nombre_grupo,))
+                resultado = cursor.fetchone()
+                if resultado[0] > 0:
+                    print("Ya existe un grupo con ese nombre, intenta otro.")
+                else:
+                    cursor.execute("INSERT INTO Grupos (Nombre) VALUES (?)", (nombre_grupo,))
+                    conexion.commit()
+                    print("Grupo creado con exito.")
+                    repetir = False
+            except Exception as e:
+                print("Error al crear grupo: " + str(e))
+                print("Intenta de nuevo.")
+
+
+#Bloque para agregar usuarios a un grupo
+def agregar_usuario_a_grupo(cursor, conexion):
+    repetir = True
+    while repetir:
+        try:
+            grupo_id = int(input("Ingresa el ID del grupo: "))
+            usuario_id = int(input("Ingresa el ID del usuario a agregar: "))
+        except ValueError:
+            print("Debe ingresar numeros validos para IDs.")
+        else:
+            try:
+                cursor.execute("SELECT COUNT(*) FROM Grupos WHERE GrupoID = ?", (grupo_id,))
+                grupo = cursor.fetchone()
+                if grupo[0] == 0:
+                    print("El grupo no existe. Intenta de nuevo.")
+                else:
+                    cursor.execute("SELECT COUNT(*) FROM Usuarios WHERE UsuarioID = ?", (usuario_id,))
+                    usuario = cursor.fetchone()
+                    if usuario[0] == 0:
+                        print("El usuario no existe. Intenta de nuevo.")
+                    else:
+                        cursor.execute("SELECT COUNT(*) FROM MiembrosGrupo WHERE GrupoID = ? AND UsuarioID = ?", (grupo_id, usuario_id))
+                        miembro = cursor.fetchone()
+                        if miembro[0] > 0:
+                            print("El usuario ya pertenece a ese grupo.")
+                            repetir = False
+                        else:
+                            cursor.execute("INSERT INTO MiembrosGrupo (GrupoID, UsuarioID) VALUES (?, ?)", (grupo_id, usuario_id))
+                            conexion.commit()
+                            print("Usuario agregado al grupo con exito.")
+                            repetir = False
+            except Exception as e:
+                print("Error al agregar usuario al grupo: " + str(e))
+                print("Intenta de nuevo.")
+
+
+#BLOQUE Para enviar mensajes a un grupo
+def enviar_mensaje_a_grupo(cursor, conexion):
+    print("\n")
+    print("+---------------------------------------------------+")
+    print("|            Para insertar es asi:                  |")
+    print("+---------------------------------------------------+")
+    print("|    A: 2, B: 22, C: 222, D: 3, E: 33, F: 333       |")
+    print("+---------------------------------------------------+")
+    print("|    G: 4, H: 44, I: 444, J: 5, K: 55, L: 555       |")
+    print("+---------------------------------------------------+")
+    print("|M: 6, N: 66, O: 666, P: 7, Q: 77, R: 777, S: 7777  |")
+    print("+---------------------------------------------------+")
+    print("|T: 8, U: 88, V: 888, W: 9, X: 99, Y: 999, Z: 9999  |")
+    print("+---------------------------------------------------+")
+    print("|          La tecla |del 0| significa espacio.      |")
+    print("+---------------------------------------------------+ \n")
+    repetir = True
+    while repetir:
+        try:
+            remitente_id = int(input("Ingresa tu UsuarioID (remitente): "))
+            grupo_id = int(input("Ingresa el GrupoID al que enviar el mensaje: "))
+        except ValueError:
+            print("Debe ingresar numeros validos para los IDs.")
+        else:
+            try:
+                cursor.execute("SELECT COUNT(*) FROM Usuarios WHERE UsuarioID = ?", (remitente_id,))
+                usuario = cursor.fetchone()
+                if usuario[0] == 0:
+                    print("El remitente no existe. Intenta de nuevo.")
+                else:
+                    cursor.execute("SELECT COUNT(*) FROM Grupos WHERE GrupoID = ?", (grupo_id,))
+                    grupo = cursor.fetchone()
+                    if grupo[0] == 0:
+                        print("El grupo no existe. Intenta de nuevo.")
+                    else:
+                        mensaje_original = input("Ingresa el mensaje a enviar al grupo: ")
+
+#Bloque con parte de traduccion del mensaje del bloque 3 funcion 3 para traducir el mensaje que se envio al grupo
+                        resultado = ""
+                        numero = ""
+                        posicion = 0
+                        longitud = len(mensaje_original)
+
+                        while posicion < longitud:
+                            actual = mensaje_original[posicion]
+                            if posicion > 0 and mensaje_original[posicion] != mensaje_original[posicion - 1]:
+                                if numero == "2":
+                                    resultado += "a"
+                                elif numero == "22":
+                                    resultado += "b"
+                                elif numero == "222":
+                                    resultado += "c"
+                                elif numero == "3":
+                                    resultado += "d"
+                                elif numero == "33":
+                                    resultado += "e"
+                                elif numero == "333":
+                                    resultado += "f"
+                                elif numero == "4":
+                                    resultado += "g"
+                                elif numero == "44":
+                                    resultado += "h"
+                                elif numero == "444":
+                                    resultado += "i"
+                                elif numero == "5":
+                                    resultado += "j"
+                                elif numero == "55":
+                                    resultado += "k"
+                                elif numero == "555":
+                                    resultado += "l"
+                                elif numero == "6":
+                                    resultado += "m"
+                                elif numero == "66":
+                                    resultado += "n"
+                                elif numero == "666":
+                                    resultado += "o"
+                                elif numero == "7":
+                                    resultado += "p"
+                                elif numero == "77":
+                                    resultado += "q"
+                                elif numero == "777":
+                                    resultado += "r"
+                                elif numero == "7777":
+                                    resultado += "s"
+                                elif numero == "8":
+                                    resultado += "t"
+                                elif numero == "88":
+                                    resultado += "u"
+                                elif numero == "888":
+                                    resultado += "v"
+                                elif numero == "9":
+                                    resultado += "w"
+                                elif numero == "99":
+                                    resultado += "x"
+                                elif numero == "999":
+                                    resultado += "y"
+                                elif numero == "9999":
+                                    resultado += "z"
+                                elif numero == "0":
+                                    resultado += " "
+                                numero = mensaje_original[posicion]
+                            else:
+                                numero += mensaje_original[posicion]
+                            posicion += 1
+
+                        if numero == "2":
+                            resultado += "a"
+                        elif numero == "22":
+                            resultado += "b"
+                        elif numero == "222":
+                            resultado += "c"
+                        elif numero == "3":
+                            resultado += "d"
+                        elif numero == "33":
+                            resultado += "e"
+                        elif numero == "333":
+                            resultado += "f"
+                        elif numero == "4":
+                            resultado += "g"
+                        elif numero == "44":
+                            resultado += "h"
+                        elif numero == "444":
+                            resultado += "i"
+                        elif numero == "5":
+                            resultado += "j"
+                        elif numero == "55":
+                            resultado += "k"
+                        elif numero == "555":
+                            resultado += "l"
+                        elif numero == "6":
+                            resultado += "m"
+                        elif numero == "66":
+                            resultado += "n"
+                        elif numero == "666":
+                            resultado += "o"
+                        elif numero == "7":
+                            resultado += "p"
+                        elif numero == "77":
+                            resultado += "q"
+                        elif numero == "777":
+                            resultado += "r"
+                        elif numero == "7777":
+                            resultado += "s"
+                        elif numero == "8":
+                            resultado += "t"
+                        elif numero == "88":
+                            resultado += "u"
+                        elif numero == "888":
+                            resultado += "v"
+                        elif numero == "9":
+                            resultado += "w"
+                        elif numero == "99":
+                            resultado += "x"
+                        elif numero == "999":
+                            resultado += "y"
+                        elif numero == "9999":
+                            resultado += "z"
+                        elif numero == "0":
+                            resultado += " "
+
+                        contenido = resultado  
+
+                        from datetime import datetime
+                        fecha_envio = datetime.now()
+
+                        cursor.execute("""
+                            INSERT INTO Mensajes (RemitenteID, MensajeOriginal, MensajeTraducido, FechaEnvio, contenido)
+                            VALUES (?, ?, ?, ?, ?)
+                        """, (remitente_id, mensaje_original, resultado, fecha_envio, contenido))
+                        conexion.commit()
+
+                        mensaje_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+
+                        cursor.execute("SELECT UsuarioID FROM MiembrosGrupo WHERE GrupoID = ?", (grupo_id,))
+                        miembros = cursor.fetchall()
+
+                        if miembros == []:
+                            print("El grupo no tiene miembros para enviar el mensaje.")
+                            repetir = False
+                        else:
+                            for miembro in miembros:
+                                usuario_id = miembro[0]
+                                cursor.execute("""
+                                    INSERT INTO MensajesDestinatarios (MensajeID, DestinatarioID, Estado, FechaEstado)
+                                    VALUES (?, ?, ?, ?)
+                                """, (mensaje_id, usuario_id, "Enviado", fecha_envio))
+                            conexion.commit()
+                            print("Mensaje enviado al grupo con exito. Miembros notificados: " + str(len(miembros)))
+                            repetir = False
+            except Exception as e:
+                print("Error al enviar mensaje al grupo: " + str(e))
+                print("Intenta de nuevo.")
+
+
+
+
+#Bloque para ver el historial de auditoria
+def ver_historial_auditoria(cursor):
+    try:
+        print("\n--- Historial de Auditoria ---")
+        
+        cursor.execute("SELECT AuditoriaID, UsuarioID, Accion, Fecha FROM Auditoria ORDER BY Fecha DESC")
+        registros = cursor.fetchall()
+        
+        if len(registros) == 0:
+            print("No hay registros de auditoria.")
+        else:
+            for reg in registros:
+                auditoria_id = reg[0]
+                usuario_id = reg[1]
+                accion = reg[2]
+                fecha_hora = reg[3]
+                
+                descripcion = reg[4]
+                print("ID Auditoria: " + str(auditoria_id) + " | UsuarioID: " + str(usuario_id) + " | Accion: " + accion + " | Fecha y Hora: " + str(fecha_hora) + " | Descripcion: " + descripcion)
+    except Exception as e:
+        print("Error al consultar el historial de auditoria: " + str(e))
+
+
+#Bloque con el Menu principal que en realiadd sera lo que se ejecutara al correr el programa de una ve y tiene el bucle que mantiene al programa en bucle
+while ValueError:
+    print("\n========= MENU PRINCIPAL =========")
+    print("1. Registrar usuario")
+    print("2. Ver lista de usuarios")
+    print("3. Enviar mensaje")
+    print("4. Ver mensajes enviados")
+    print("5. Crear grupo")
+    print("6. Agregar usuario a grupo")
+    print("7. Enviar mensaje a grupo")
+    print("8. Ver historial de auditoria")
+    print("9. Salir")
+#bloque con un try except para el manejo de errores al elegir la opcion   
+    try:
+        opcion = int(input("elige una opcion: "))
+    except ValueError:
+        print("debes escribir un numero")
+        continue
+#condicionale para correr el programa y las funciones en base a a la eleccion del usuario
+    if opcion == 1:
+        registrar_usuario(cursor, conexion)
+    elif opcion == 2:
+        ver_lista_usuarios(cursor)
+    elif opcion == 3:
+        enviar_mensaje()
+    elif opcion == 4:
+        ver_mensajes_enviados(cursor)
+    elif opcion == 5:
+        crear_grupo(cursor, conexion)
+    elif opcion == 6:
+        agregar_usuario_a_grupo(cursor, conexion)
+    elif opcion == 7:
+        enviar_mensaje_a_grupo(cursor, conexion)
+    elif opcion == 8:
+        ver_historial_auditoria(cursor)
+    elif opcion == 9:
+        print("saliendo del programa...")
+        break
+    else:
+        print("opcion invalida, intenta otra vez")
+
+#bueno, algo tambien importante para el codigo es que, ponemos excep exception como el error as e, para ponerle un alias al error
+#eso lo hago en cada funcion por ejemplo
